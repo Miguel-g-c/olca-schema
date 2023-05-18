@@ -421,4 +421,14 @@ def new_impact_method(
 
 
 def as_ref(e: Union[RefEntity, Ref]) -> Ref:
-    return e if isinstance(e, Ref) else e.to_ref()
+    if isinstance(e, Ref):
+        return e
+    ref = e.to_ref()
+    additional_attrs = ["flow_type", "location", "process_type", "ref_unit"]
+    for attr in additional_attrs:
+        v = getattr(e, attr, None)
+        if isinstance(v, Ref):
+            setattr(ref, attr, v.name)
+        else:
+            setattr(ref, attr, v)
+    return ref
